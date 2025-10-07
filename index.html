@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UAT Domain Status Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.operational { background-color: #28a745; } /* green */
+.down { background-color: #dc3545; } /* red */
+.domain-card {
+    padding: 12px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+.domain-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.domain-name {
+    display: flex;
+    align-items: center;
+}
+.domain-name i {
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+</style>
+</head>
+<body>
+<div class="container py-5">
+<div class="border p-3 rounded-4">
+<div class="text-center">
+<img src="https://support.uat.edu.ng/assets/images/uatlogo.png" width="100">
+</div>
+    <h3 class="mb-4 text-center">UAT Domain Status Dashboard</h3>
+    <p>This is UAT's status page, where you can get updates on how our systems are doing. If there are interruptions to service, we will post a note here.</p>
+    <div class="row" id="domainRow"></div>
+    </div>
+</div>
+
+<script>
+// UAT domains with optional icons (Bootstrap Icons used here as example)
+const domains = [
+    { name: "Koha Library", url: "https://koha.uat.edu.ng", icon: "bi-book" },
+    { name: "IR Portal", url: "https://ir.uat.edu.ng", icon: "bi-journal-text" },
+    { name: "Central Support System", url: "https://support.uat.edu.ng", icon: "bi-headset" },
+    { name: "My UAT Portal", url: "https://my.uat.edu.ng", icon: "bi-person-circle" },
+    { name: "Main Website", url: "https://www.uat.edu.ng", icon: "bi-globe" },
+    { name: "Journals", url: "https://journals.uat.edu.ng", icon: "bi-file-earmark-text" },
+    { name: "TP Portal", url: "https://tp.uat.edu.ng", icon: "bi-window-sidebar" },
+    { name: "UAIST Portal", url: "https://uaist.uat.edu.ng", icon: "bi-building" }
+];
+
+const domainRow = document.getElementById('domainRow');
+
+async function checkDomain(domain) {
+    try {
+        await fetch(domain.url, { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' });
+        return "Operational";
+    } catch (error) {
+        return "Down";
+    }
+}
+
+// Populate dashboard using row/col
+domains.forEach(async domain => {
+    const col = document.createElement('div');
+    col.className = 'col-md-6';
+
+    col.innerHTML = `
+        <div class="domain-card domain-flex">
+            <span class="domain-name">
+                <i class="bi ${domain.icon}"></i>
+                <a href="${domain.url}" target="_blank" class="text-decoration-none" title="${domain.url}">${domain.name}</a>
+            </span>
+            <span class="status-dot operational"></span>
+        </div>
+    `;
+    domainRow.appendChild(col);
+
+    const status = await checkDomain(domain);
+    const dot = col.querySelector('.status-dot');
+    dot.className = `status-dot ${status === "Operational" ? 'operational' : 'down'}`;
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
