@@ -6,12 +6,15 @@
 <title>UAT Domain Status Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+	<!-- Favicon -->
+	<link rel="shortcut icon" href="http://localhost/support/assets/images/uatlogo.png">
 <style>
 .status-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     display: inline-block;
+    margin-right: 6px;
 }
 .operational { background-color: #28a745; } /* green */
 .down { background-color: #dc3545; } /* red */
@@ -34,26 +37,27 @@
     font-size: 1.2rem;
     margin-right: 8px;
 }
+.status-text {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
 </style>
 </head>
 <body>
 <div class="container py-5">
-    <div class="row">
-        <div class="col-lg-8 col-12 mx-auto">
 <div class="border p-3 rounded-4">
-<div class="text-center">
-<img src="https://support.uat.edu.ng/assets/images/uatlogo.png" width="100">
+<div class="text-center mb-4">
+    <img src="https://support.uat.edu.ng/assets/images/uatlogo.png" width="100">
 </div>
-    <h3 class="mb-4 text-center">UAT Domain Status Dashboard</h3>
-    <p>This is UAT's status page, where you can get updates on how our systems are doing. If there are interruptions to service, we will post a note here.</p>
-    <div class="row" id="domainRow"></div>
-    </div>
+<h3 class="mb-2 text-center">UAT Domain Status Dashboard</h3>
+<p class="text-center mb-4">This is UAT's status page, where you can get updates on how our systems are doing. If there are interruptions to service, we will post a note here.</p>
+<div class="row" id="domainRow"></div>
 </div>
-        </div>
 </div>
 
 <script>
-// UAT domains with optional icons (Bootstrap Icons used here as example)
+// UAT domains with icons
 const domains = [
     { name: "Koha Library", url: "https://koha.uat.edu.ng", icon: "bi-book" },
     { name: "IR Portal", url: "https://ir.uat.edu.ng", icon: "bi-journal-text" },
@@ -76,7 +80,7 @@ async function checkDomain(domain) {
     }
 }
 
-// Populate dashboard using row/col
+// Populate dashboard
 domains.forEach(async domain => {
     const col = document.createElement('div');
     col.className = 'col-md-6';
@@ -87,14 +91,25 @@ domains.forEach(async domain => {
                 <i class="bi ${domain.icon}"></i>
                 <a href="${domain.url}" target="_blank" class="text-decoration-none" title="${domain.url}">${domain.name}</a>
             </span>
-            <span class="status-dot operational"></span>
+            <span class="status-text">
+                <span class="status-dot operational"></span>
+                <span class="status-name">Operational</span>
+            </span>
         </div>
     `;
     domainRow.appendChild(col);
 
     const status = await checkDomain(domain);
     const dot = col.querySelector('.status-dot');
-    dot.className = `status-dot ${status === "Operational" ? 'operational' : 'down'}`;
+    const statusName = col.querySelector('.status-name');
+
+    if(status === "Operational"){
+        dot.className = "status-dot operational";
+        statusName.textContent = "Operational";
+    } else {
+        dot.className = "status-dot down";
+        statusName.textContent = "Down";
+    }
 });
 </script>
 
